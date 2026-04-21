@@ -2096,7 +2096,7 @@ async function cLogin(){
   var btn=document.getElementById('loginBtnTxt'),loader=document.getElementById('loginLoader');btn.style.display='none';loader.style.display='block';
   var hashedPwd=await hashPassword(pwd),customer=null,wh=localStorage.getItem(WH)||WEBHOOK_URL;
   if(wh){try{var r=await fetch(wh,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'getCustomer',customerId:uid,password:hashedPwd})});var res=await r.json();if(res.status==='success'){customer=res.customer;customer.id=res.customer.id;var lc=JSON.parse(localStorage.getItem('sf_customers')||'{}');lc[customer.id]=Object.assign({},customer,{pwd:hashedPwd});localStorage.setItem('sf_customers',JSON.stringify(lc));}}catch(e){}}
-  if(!customer){var lc=JSON.parse(localStorage.getItem('sf_customers')||'{}');Object.keys(lc).forEach(function(k){var c=lc[k];if((c.phone===uid||c.email===uid||k===uid)&&c.pwd===hashedPwd)customer=Object.assign({},c,{id:k});});}
+  if(!customer){var lc=JSON.parse(localStorage.getItem('sf_customers')||'{}');Object.keys(lc).forEach(function(k){var c=lc[k];if((c.phone===uid||c.email===uid||k===uid)&&(c.pwd===hashedPwd||c.pwd===pwd))customer=Object.assign({},c,{id:k});});}
   btn.style.display='';loader.style.display='none';
   if(customer){loginSuccess(customer);}else{erEl.textContent='❌ Wrong phone/email or password. If not registered, click "New Registration" tab.';erEl.classList.add('show');}
 }
@@ -2153,6 +2153,8 @@ function clearData(){if(confirm('Clear all local submission data? (Google Sheet 
     var btn=this.querySelector('.submit-btn'),bt=btn?btn.querySelector('.bt'):null,bl=btn?btn.querySelector('.bll,.spin'):null;
     document.getElementById('ac-ok').classList.remove('show');document.getElementById('ac-er').classList.remove('show');
     var fd=new FormData(this),data={action:'addCustomer'};for(var [k,v] of fd.entries())data[k]=v;
+    // Hash password so customer can login with same password via cLogin()
+    var rawPwd=data.password||'';data.password=await hashPassword(rawPwd);
     if(btn)btn.disabled=true;if(bt)bt.style.display='none';if(bl)bl.style.display='block';await new Promise(r=>setTimeout(r,800));
     var success=false,wh=localStorage.getItem(WH)||WEBHOOK_URL;
     try{var r=await fetch(wh,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(data)});var res=await r.json();if(res.status==='success')success=true;}catch(err){success=true;}
