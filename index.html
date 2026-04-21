@@ -987,7 +987,16 @@ async function fbQuery(c,f,v){if(!db)return[];try{var s=await db.collection(c).w
       <div class="field"><label>Original Price (₹)</label><input type="number" id="pOrigPrice" placeholder="e.g. 30000"></div>
     </div>
     <div class="field"><label>Description *</label><textarea id="pDesc" placeholder="Product description..."></textarea></div>
-    <div class="field"><label>Photo URL or leave blank</label><input type="url" id="pImg" placeholder="https://... (optional)"></div>
+    <div class="field"><label>Product Photo</label>
+      <div onclick="document.getElementById('pImgFile').click()" id="pImgDropZone" style="border:2px dashed rgba(245,166,35,0.35);border-radius:10px;padding:14px;text-align:center;cursor:pointer;margin-bottom:6px;transition:all 0.2s;">
+        <div id="pImgPreviewWrap" style="display:none;margin-bottom:6px;"><img id="pImgPreview" src="" style="max-height:80px;max-width:100%;border-radius:8px;object-fit:cover;"></div>
+        <div style="font-size:13px;color:var(--sun);font-weight:600;" id="pImgDropLabel">📷 Tap to pick photo</div>
+        <div style="font-size:11px;color:var(--soft);margin-top:3px;">Or paste a URL below</div>
+      </div>
+      <input type="file" id="pImgFile" accept="image/*" style="display:none;" onchange="handleProductImgPick(this)">
+      <input type="url" id="pImg" placeholder="https://... (optional)" style="margin-top:4px;" oninput="previewProductImgUrl(this.value)">
+      <input type="hidden" id="pImgB64" value="">
+    </div>
     <div class="row2">
       <div class="field"><label>Brand</label><input type="text" id="pBrand" placeholder="e.g. Luminous"></div>
       <div class="field"><label>Stock</label><select id="pStock"><option value="in">In Stock</option><option value="out">Out of Stock</option><option value="pre">Pre-order</option></select></div>
@@ -1523,7 +1532,7 @@ function goScreen(id, isBack) {
   if(backBtn) backBtn.style.display = (screenHistory.length > 1 && id !== 'home') ? 'flex' : 'none';
   // Admin security
   if(id==='setup'){goScreen('admin',isBack);return;}
-  if(id==='admin' && !isBack){
+  if(id==='admin' && !adminLoggedIn){
     var lb=document.getElementById('adminLoginBox'); var db=document.getElementById('adminDash');
     if(lb) lb.style.display=''; if(db) db.style.display='none';
   }
@@ -1558,6 +1567,7 @@ function adminLogin(){
   var correct = localStorage.getItem(PW) || 'skyflies2024';
   hashPassword(pwd).then(function(hashedPwd){
     if(pwd===correct||hashedPwd===correct){
+      adminLoggedIn=true;
       document.getElementById('adminLoginBox').style.display='none';
       document.getElementById('adminDash').style.display='block';
       pwdInput.value='';
@@ -1585,6 +1595,7 @@ function adminLogin(){
   });
 }
 function adminLogout(){
+  adminLoggedIn=false;
   document.getElementById('adminLoginBox').style.display='';
   document.getElementById('adminDash').style.display='none';
   document.getElementById('adminPwd').value='';
@@ -1618,6 +1629,7 @@ function showAdminSetup() {
 
 
 var DB='sf_subs'; var WH='sf_wh'; var PW='sf_pwd';
+var adminLoggedIn=false;
 var curFilter='all';
 var PENDING_LIST=[];
 var currentCustomer=null;
@@ -2913,28 +2925,28 @@ function closeFullPhoto() {
 
 // Default products (admin can add more)
 var DEFAULT_PRODUCTS = [
-  {id:'p1',name:'Monocrystalline Solar Panel 400W',cat:'panels',price:9500,origPrice:12000,qty:50,unit:'piece',desc:'High efficiency mono panel, 25 year warranty. Ideal for rooftops.',brand:'Luminous',img:'',stock:'in'},
-  {id:'p2',name:'Polycrystalline Solar Panel 335W',cat:'panels',price:6800,origPrice:8500,qty:80,unit:'piece',desc:'Durable poly panel, all weather. Best value for budget installs.',brand:'Tata Solar',img:'',stock:'in'},
-  {id:'p3',name:'Bifacial Solar Panel 450W',cat:'panels',price:13500,origPrice:16000,qty:30,unit:'piece',desc:'Generates power from both sides. 20% more energy than mono.',brand:'Adani Solar',img:'',stock:'in'},
-  {id:'p4',name:'5kW Solar Hybrid Inverter',cat:'inverters',price:28000,origPrice:35000,qty:15,unit:'piece',desc:'MPPT hybrid inverter with WiFi monitoring. Works with grid and battery.',brand:'Luminous',img:'',stock:'in'},
-  {id:'p5',name:'3kW On-Grid Solar Inverter',cat:'inverters',price:18000,origPrice:22000,qty:20,unit:'piece',desc:'Pure sine wave grid-tied inverter with anti-islanding protection.',brand:'Growatt',img:'',stock:'in'},
-  {id:'p6',name:'150Ah Tall Tubular Solar Battery',cat:'batteries',price:14000,origPrice:16500,qty:40,unit:'piece',desc:'Deep cycle battery for solar. 5 year warranty.',brand:'Exide',img:'',stock:'in'},
-  {id:'p7',name:'100Ah Lithium Solar Battery',cat:'batteries',price:22000,origPrice:28000,qty:20,unit:'piece',desc:'LiFePO4 lithium, 10 year life, 3000 cycles. Lightweight.',brand:'Livfast',img:'',stock:'in'},
-  {id:'p8',name:'Solar LED Street Light 30W',cat:'lighting',price:3200,origPrice:4000,qty:100,unit:'piece',desc:'All-in-one solar street light with motion sensor. IP65 waterproof.',brand:'Skyflies',img:'',stock:'in'},
-  {id:'p9',name:'Solar LED Bulb 9W - Pack of 10',cat:'lighting',price:1200,origPrice:1800,qty:200,unit:'pack',desc:'9W solar LED bulbs for 12V DC system. 3 year warranty.',brand:'Syska',img:'',stock:'in'},
-  {id:'p10',name:'Solar Garden Light - Pack of 6',cat:'lighting',price:1500,origPrice:2000,qty:150,unit:'pack',desc:'Waterproof solar garden stake lights. Auto on at dusk.',brand:'Skyflies',img:'',stock:'in'},
-  {id:'p11',name:'Solar Indoor LED Lamp 5W',cat:'lighting',price:650,origPrice:900,qty:300,unit:'piece',desc:'Portable solar lamp with USB charging. 8 hour backup.',brand:'Wipro',img:'',stock:'in'},
-  {id:'p12',name:'Solar Phone Charger 20000mAh',cat:'gadgets',price:1800,origPrice:2500,qty:100,unit:'piece',desc:'Foldable solar power bank. Charges 2 phones. Waterproof.',brand:'Skyflies',img:'',stock:'in'},
-  {id:'p13',name:'Solar DC Fan 25W',cat:'gadgets',price:2200,origPrice:3000,qty:60,unit:'piece',desc:'Runs directly on solar. No inverter needed. 3 speeds, 18 inch.',brand:'Skyflies',img:'',stock:'in'},
-  {id:'p14',name:'Solar Water Pump 0.5HP',cat:'gadgets',price:8500,origPrice:10000,qty:25,unit:'piece',desc:'Submersible solar pump for agriculture and homes. 1 year warranty.',brand:'Kirloskar',img:'',stock:'in'},
-  {id:'p15',name:'Solar Radio & Torch Combo',cat:'gadgets',price:850,origPrice:1200,qty:200,unit:'piece',desc:'AM/FM solar radio with torch and phone charger. USB backup.',brand:'Skyflies',img:'',stock:'in'},
-  {id:'p16',name:'Solar CCTV Camera 2MP',cat:'gadgets',price:4500,origPrice:6000,qty:40,unit:'piece',desc:'Wireless solar CCTV, night vision, motion alerts, 64GB SD.',brand:'CP Plus',img:'',stock:'in'},
-  {id:'p17',name:'Solar Panel Mounting Structure',cat:'accessories',price:3500,origPrice:4500,qty:60,unit:'set',desc:'GI mounting for 4 panels. Hot-dip galvanised. Adjustable tilt.',brand:'Skyflies',img:'',stock:'in'},
-  {id:'p18',name:'Solar Wire 4mm 50m Roll',cat:'accessories',price:1800,origPrice:2200,qty:100,unit:'roll',desc:'UV resistant DC solar cable. 4mm cross section, TUV certified.',brand:'Polycab',img:'',stock:'in'},
-  {id:'p19',name:'MC4 Solar Connector 10 Pairs',cat:'accessories',price:450,origPrice:600,qty:500,unit:'set',desc:'Weatherproof MC4 connectors. IP67. 10 male + 10 female pairs.',brand:'Generic',img:'',stock:'in'},
-  {id:'p20',name:'40A MPPT Charge Controller',cat:'accessories',price:5500,origPrice:7000,qty:30,unit:'piece',desc:'40A MPPT with LCD display. Compatible with 12V/24V systems.',brand:'Epever',img:'',stock:'in'},
-  {id:'p21',name:'Solar Charge Controller 20A PWM',cat:'accessories',price:1200,origPrice:1800,qty:80,unit:'piece',desc:'20A PWM charge controller, dual USB, LCD display.',brand:'Phocos',img:'',stock:'in'},
-  {id:'p22',name:'Junction Box IP67 - Pack of 5',cat:'accessories',price:800,origPrice:1200,qty:150,unit:'pack',desc:'Weatherproof solar junction boxes. IP67 rated. Safe wiring.',brand:'Skyflies',img:'',stock:'in'},
+  {id:'p1',name:'Monocrystalline Solar Panel 400W',cat:'panels',price:9500,origPrice:12000,qty:50,unit:'piece',desc:'High efficiency mono panel, 25 year warranty. Ideal for rooftops.',brand:'Luminous',img:'https://images.unsplash.com/photo-1509391366360-2e959784a276?w=400&q=80&auto=format&fit=crop',stock:'in'},
+  {id:'p2',name:'Polycrystalline Solar Panel 335W',cat:'panels',price:6800,origPrice:8500,qty:80,unit:'piece',desc:'Durable poly panel, all weather. Best value for budget installs.',brand:'Tata Solar',img:'https://images.unsplash.com/photo-1558449028-b53a39d100fc?w=400&q=80&auto=format&fit=crop',stock:'in'},
+  {id:'p3',name:'Bifacial Solar Panel 450W',cat:'panels',price:13500,origPrice:16000,qty:30,unit:'piece',desc:'Generates power from both sides. 20% more energy than mono.',brand:'Adani Solar',img:'https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?w=400&q=80&auto=format&fit=crop',stock:'in'},
+  {id:'p4',name:'5kW Solar Hybrid Inverter',cat:'inverters',price:28000,origPrice:35000,qty:15,unit:'piece',desc:'MPPT hybrid inverter with WiFi monitoring. Works with grid and battery.',brand:'Luminous',img:'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&q=80&auto=format&fit=crop',stock:'in'},
+  {id:'p5',name:'3kW On-Grid Solar Inverter',cat:'inverters',price:18000,origPrice:22000,qty:20,unit:'piece',desc:'Pure sine wave grid-tied inverter with anti-islanding protection.',brand:'Growatt',img:'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?w=400&q=80&auto=format&fit=crop',stock:'in'},
+  {id:'p6',name:'150Ah Tall Tubular Solar Battery',cat:'batteries',price:14000,origPrice:16500,qty:40,unit:'piece',desc:'Deep cycle battery for solar. 5 year warranty.',brand:'Exide',img:'https://images.unsplash.com/photo-1601597111158-2fceff292cdc?w=400&q=80&auto=format&fit=crop',stock:'in'},
+  {id:'p7',name:'100Ah Lithium Solar Battery',cat:'batteries',price:22000,origPrice:28000,qty:20,unit:'piece',desc:'LiFePO4 lithium, 10 year life, 3000 cycles. Lightweight.',brand:'Livfast',img:'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&q=80&auto=format&fit=crop',stock:'in'},
+  {id:'p8',name:'Solar LED Street Light 30W',cat:'lighting',price:3200,origPrice:4000,qty:100,unit:'piece',desc:'All-in-one solar street light with motion sensor. IP65 waterproof.',brand:'Skyflies',img:'https://images.unsplash.com/photo-1558002038-1055907df827?w=400&q=80&auto=format&fit=crop',stock:'in'},
+  {id:'p9',name:'Solar LED Bulb 9W - Pack of 10',cat:'lighting',price:1200,origPrice:1800,qty:200,unit:'pack',desc:'9W solar LED bulbs for 12V DC system. 3 year warranty.',brand:'Syska',img:'https://images.unsplash.com/photo-1524484485831-a92ffc0de03f?w=400&q=80&auto=format&fit=crop',stock:'in'},
+  {id:'p10',name:'Solar Garden Light - Pack of 6',cat:'lighting',price:1500,origPrice:2000,qty:150,unit:'pack',desc:'Waterproof solar garden stake lights. Auto on at dusk.',brand:'Skyflies',img:'https://images.unsplash.com/photo-1550525811-e5869dd03032?w=400&q=80&auto=format&fit=crop',stock:'in'},
+  {id:'p11',name:'Solar Indoor LED Lamp 5W',cat:'lighting',price:650,origPrice:900,qty:300,unit:'piece',desc:'Portable solar lamp with USB charging. 8 hour backup.',brand:'Wipro',img:'https://images.unsplash.com/photo-1517697471339-4aa32003c11a?w=400&q=80&auto=format&fit=crop',stock:'in'},
+  {id:'p12',name:'Solar Phone Charger 20000mAh',cat:'gadgets',price:1800,origPrice:2500,qty:100,unit:'piece',desc:'Foldable solar power bank. Charges 2 phones. Waterproof.',brand:'Skyflies',img:'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=400&q=80&auto=format&fit=crop',stock:'in'},
+  {id:'p13',name:'Solar DC Fan 25W',cat:'gadgets',price:2200,origPrice:3000,qty:60,unit:'piece',desc:'Runs directly on solar. No inverter needed. 3 speeds, 18 inch.',brand:'Skyflies',img:'https://images.unsplash.com/photo-1624813875286-33c3e5e9f61b?w=400&q=80&auto=format&fit=crop',stock:'in'},
+  {id:'p14',name:'Solar Water Pump 0.5HP',cat:'gadgets',price:8500,origPrice:10000,qty:25,unit:'piece',desc:'Submersible solar pump for agriculture and homes. 1 year warranty.',brand:'Kirloskar',img:'https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=400&q=80&auto=format&fit=crop',stock:'in'},
+  {id:'p15',name:'Solar Radio & Torch Combo',cat:'gadgets',price:850,origPrice:1200,qty:200,unit:'piece',desc:'AM/FM solar radio with torch and phone charger. USB backup.',brand:'Skyflies',img:'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=400&q=80&auto=format&fit=crop',stock:'in'},
+  {id:'p16',name:'Solar CCTV Camera 2MP',cat:'gadgets',price:4500,origPrice:6000,qty:40,unit:'piece',desc:'Wireless solar CCTV, night vision, motion alerts, 64GB SD.',brand:'CP Plus',img:'https://images.unsplash.com/photo-1555368539-b3fbe77d0a5f?w=400&q=80&auto=format&fit=crop',stock:'in'},
+  {id:'p17',name:'Solar Panel Mounting Structure',cat:'accessories',price:3500,origPrice:4500,qty:60,unit:'set',desc:'GI mounting for 4 panels. Hot-dip galvanised. Adjustable tilt.',brand:'Skyflies',img:'https://images.unsplash.com/photo-1504192010706-dd7f569ee2be?w=400&q=80&auto=format&fit=crop',stock:'in'},
+  {id:'p18',name:'Solar Wire 4mm 50m Roll',cat:'accessories',price:1800,origPrice:2200,qty:100,unit:'roll',desc:'UV resistant DC solar cable. 4mm cross section, TUV certified.',brand:'Polycab',img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80&auto=format&fit=crop',stock:'in'},
+  {id:'p19',name:'MC4 Solar Connector 10 Pairs',cat:'accessories',price:450,origPrice:600,qty:500,unit:'set',desc:'Weatherproof MC4 connectors. IP67. 10 male + 10 female pairs.',brand:'Generic',img:'https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=400&q=80&auto=format&fit=crop',stock:'in'},
+  {id:'p20',name:'40A MPPT Charge Controller',cat:'accessories',price:5500,origPrice:7000,qty:30,unit:'piece',desc:'40A MPPT with LCD display. Compatible with 12V/24V systems.',brand:'Epever',img:'https://images.unsplash.com/photo-1576086213369-97a306d36557?w=400&q=80&auto=format&fit=crop',stock:'in'},
+  {id:'p21',name:'Solar Charge Controller 20A PWM',cat:'accessories',price:1200,origPrice:1800,qty:80,unit:'piece',desc:'20A PWM charge controller, dual USB, LCD display.',brand:'Phocos',img:'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=400&q=80&auto=format&fit=crop',stock:'in'},
+  {id:'p22',name:'Junction Box IP67 - Pack of 5',cat:'accessories',price:800,origPrice:1200,qty:150,unit:'pack',desc:'Weatherproof solar junction boxes. IP67 rated. Safe wiring.',brand:'Skyflies',img:'https://images.unsplash.com/photo-1544724569-5f546fd6f2b5?w=400&q=80&auto=format&fit=crop',stock:'in'},
 ];
 
 var currentCat = 'all';
@@ -2945,7 +2957,15 @@ function getProducts() {
   if (saved) {
     try {
       var p = JSON.parse(saved);
-      if (p && p.length) return p;
+      if (p && p.length) {
+        // Migrate: patch images for default products that have no image yet
+        var imgMap = {};
+        DEFAULT_PRODUCTS.forEach(function(dp){ if(dp.img) imgMap[dp.id]=dp.img; });
+        var changed = false;
+        p.forEach(function(prod){ if(!prod.img && imgMap[prod.id]){ prod.img=imgMap[prod.id]; changed=true; } });
+        if(changed) localStorage.setItem('sf_products', JSON.stringify(p));
+        return p;
+      }
     } catch(e) {}
   }
   var defaults = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
@@ -3179,6 +3199,35 @@ async function placeOrder() {
   }
 }
 
+// ── PRODUCT IMAGE PICKER ─────────────────────────────────────────
+function handleProductImgPick(input) {
+  var file = input.files && input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var b64 = e.target.result;
+    document.getElementById('pImgB64').value = b64;
+    document.getElementById('pImg').value = '';
+    var prev = document.getElementById('pImgPreview');
+    var wrap = document.getElementById('pImgPreviewWrap');
+    var lbl  = document.getElementById('pImgDropLabel');
+    if (prev) prev.src = b64;
+    if (wrap) wrap.style.display = 'block';
+    if (lbl)  lbl.textContent = '✅ Photo selected — tap to change';
+  };
+  reader.readAsDataURL(file);
+}
+function previewProductImgUrl(url) {
+  if (!url) return;
+  document.getElementById('pImgB64').value = '';
+  var prev = document.getElementById('pImgPreview');
+  var wrap = document.getElementById('pImgPreviewWrap');
+  var lbl  = document.getElementById('pImgDropLabel');
+  if (prev) { prev.src = url; prev.onerror = function(){ wrap.style.display='none'; lbl.textContent='📷 Tap to pick photo'; }; }
+  if (wrap) wrap.style.display = 'block';
+  if (lbl)  lbl.textContent = '🔗 URL set — tap to use photo instead';
+}
+
 // ── ADMIN PRODUCT MANAGEMENT ─────────────────────────────────────
 function addProduct() {
   var name  = (document.getElementById('pName') || {}).value || '';
@@ -3186,7 +3235,7 @@ function addProduct() {
   var price = parseInt((document.getElementById('pPrice') || {}).value || 0);
   var orig  = parseInt((document.getElementById('pOrigPrice') || {}).value || 0);
   var desc  = (document.getElementById('pDesc') || {}).value || '';
-  var img   = (document.getElementById('pImg') || {}).value || '';
+  var img   = (document.getElementById('pImgB64') || {}).value || (document.getElementById('pImg') || {}).value || '';
   var brand = (document.getElementById('pBrand') || {}).value || 'Skyflies';
   var stock = (document.getElementById('pStock') || {}).value || 'in';
   var ok    = document.getElementById('addProductOk');
@@ -3221,9 +3270,12 @@ function addProduct() {
   setTimeout(function(){ if(ok){ok.style.display='none';ok.classList.remove('show');} }, 2500);
 
   // Clear fields
-  ['pName','pPrice','pOrigPrice','pDesc','pImg','pBrand','pQty'].forEach(function(id){
+  ['pName','pPrice','pOrigPrice','pDesc','pImg','pBrand','pQty','pImgB64'].forEach(function(id){
     var el = document.getElementById(id); if(el) el.value='';
   });
+  var pw = document.getElementById('pImgPreviewWrap'); if(pw) pw.style.display='none';
+  var pl = document.getElementById('pImgDropLabel'); if(pl) pl.textContent='📷 Tap to pick photo';
+  var pf = document.getElementById('pImgFile'); if(pf) pf.value='';
 
   renderAdminProducts();
   showToast('✅ Product added to store!');
