@@ -773,7 +773,7 @@ async function fbQuery(c,f,v){if(!db)return[];try{var s=await db.collection(c).w
     <div class="social-link-card" onclick="goScreen('cart')"><div class="soc-ico" style="background:rgba(16,185,129,0.15);">🛍️</div><div><div class="soc-info-name">My Cart</div><div class="soc-info-sub">View & place orders</div></div><div class="soc-arrow">›</div></div>
     <div class="social-link-card" onclick="goScreen('admin')"><div class="soc-ico" style="background:rgba(239,68,68,0.15);">🔐</div><div><div class="soc-info-name">Admin Dashboard</div><div class="soc-info-sub">Manage submissions & send notifications</div></div><div class="soc-arrow">›</div></div>
     <div class="social-link-card" onclick="goScreen('adminstore')"><div class="soc-ico" style="background:rgba(245,166,35,0.15);">🛍️</div><div><div class="soc-info-name">Manage Store</div><div class="soc-info-sub">Add & edit products</div></div><div class="soc-arrow">›</div></div>
-    <div><div class="soc-info-name">Setup</div><div class="soc-info-sub">Google Sheets connection</div></div><div class="soc-arrow">›</div></div>
+    <div class="social-link-card" onclick="goScreen('setup')"><div class="soc-ico" style="background:rgba(99,102,241,0.15);">⚙️</div><div><div class="soc-info-name">Setup</div><div class="soc-info-sub">Google Sheets connection</div></div><div class="soc-arrow">›</div></div>
   </div>
 
   <div class="sec-head"><div class="sec-title">Follow Us</div></div>
@@ -1411,7 +1411,7 @@ function sendBulkNotification(ss, data) {
           '<div style="background:#f9f9f9;padding:20px;border-radius:0 0 10px 10px;">' +
           '<h3 style="color:#333;">' + (data.title || '') + '</h3>' +
           '<p style="color:#555;line-height:1.7;">' + (data.message || '') + '</p>' +
-          '<a href="https://skyfliessolar.github.io/skyflies" style="display:inline-block;background:#F5A623;color:#080F1E;padding:10px 24px;border-radius:8px;font-weight:700;text-decoration:none;margin-top:10px;">Open App →</a>' +
+          '<a href="https://skyfliessolar.github.io/skyflies-mobile-app/" style="display:inline-block;background:#F5A623;color:#080F1E;padding:10px 24px;border-radius:8px;font-weight:700;text-decoration:none;margin-top:10px;">Open App →</a>' +
           '<p style="font-size:11px;color:#999;margin-top:16px;">📞 +91 93854 49167 | www.skyflies.in</p>' +
           '</div></div>'
       });
@@ -1448,7 +1448,7 @@ function getCustomerByEmail(ss,data){var sh=ss.getSheetByName('Customer Logins')
 function updatePassword(ss,data){var sh=ss.getSheetByName('Customer Logins');if(!sh)return{status:'error'};var rows=sh.getDataRange().getValues();for(var i=1;i<rows.length;i++){if(String(rows[i][4]).trim().toLowerCase()===String(data.email).trim().toLowerCase()){sh.getRange(i+1,3).setValue(data.newPassword);return{status:'success'};}}return{status:'error'};}
 function addQuery(ss,data){var headers=['#','Time','Customer ID','Name','Type','Priority','Message','Status','Response'];var sh=getOrCreate(ss,'Customer Queries',headers);sh.appendRow([sh.getLastRow(),new Date().toLocaleString('en-IN',{timeZone:'Asia/Kolkata'}),data.customerId,data.customerName||'',data.queryType,data.priority||'Normal',data.message,'Open','']);try{MailApp.sendEmail(ADMIN_EMAIL,'Query – '+(data.customerName||data.customerId)+' | '+data.queryType,data.message);}catch(e){}return{status:'success'};}
 function getAllCustomers(ss,data){var sh=ss.getSheetByName('Customer Logins');if(!sh)return{status:'success',customers:[]};var rows=sh.getDataRange().getValues();var out=[];for(var i=1;i<rows.length;i++){if(!String(rows[i][0]).trim())continue;out.push({id:rows[i][0],name:rows[i][1],password:rows[i][2],phone:rows[i][3],email:rows[i][4],city:rows[i][5],address:rows[i][6],systemSize:rows[i][7],panels:rows[i][8],installCost:rows[i][9],amountPaid:rows[i][10],plan:rows[i][11],billingCycle:rows[i][12],nextService:rows[i][13],systemStatus:rows[i][14],installDate:rows[i][15],notes:rows[i][16]||''});}return{status:'success',customers:out};}
-function sendWelcomeEmail(ss,data){try{MailApp.sendEmail({to:data.email,subject:'✅ Welcome to Skyflies Solar! Your ID: '+data.customerId,htmlBody:'<div style="font-family:Arial;max-width:500px;margin:0 auto;"><div style="background:#F5A623;padding:16px;border-radius:10px 10px 0 0;text-align:center;"><h2 style="color:#080F1E;margin:0;">☀️ Welcome to Skyflies Solar!</h2></div><div style="background:#f9f9f9;padding:24px;border-radius:0 0 10px 10px;"><p>Hi '+data.name+', your account is ready!</p><div style="background:#fff;border:2px solid #F5A623;border-radius:10px;padding:16px;text-align:center;"><h1 style="color:#FF6B00;font-size:32px;letter-spacing:4px;margin:0;">'+data.customerId+'</h1></div><p style="font-size:12px;color:#666;">Login with your phone or email + password.<br>Our team will contact you for a free site survey.</p><a href="https://skyfliessolar.github.io/skyflies" style="display:inline-block;background:#F5A623;color:#080F1E;padding:10px 24px;border-radius:8px;font-weight:700;text-decoration:none;">Open My Account →</a></div></div>'});return{status:'success'};}catch(e){return{status:'error',message:e.toString()};}}
+function sendWelcomeEmail(ss,data){try{MailApp.sendEmail({to:data.email,subject:'✅ Welcome to Skyflies Solar! Your ID: '+data.customerId,htmlBody:'<div style="font-family:Arial;max-width:500px;margin:0 auto;"><div style="background:#F5A623;padding:16px;border-radius:10px 10px 0 0;text-align:center;"><h2 style="color:#080F1E;margin:0;">☀️ Welcome to Skyflies Solar!</h2></div><div style="background:#f9f9f9;padding:24px;border-radius:0 0 10px 10px;"><p>Hi '+data.name+', your account is ready!</p><div style="background:#fff;border:2px solid #F5A623;border-radius:10px;padding:16px;text-align:center;"><h1 style="color:#FF6B00;font-size:32px;letter-spacing:4px;margin:0;">'+data.customerId+'</h1></div><p style="font-size:12px;color:#666;">Login with your phone or email + password.<br>Our team will contact you for a free site survey.</p><a href="https://skyfliessolar.github.io/skyflies-mobile-app/" style="display:inline-block;background:#F5A623;color:#080F1E;padding:10px 24px;border-radius:8px;font-weight:700;text-decoration:none;">Open My Account →</a></div></div>'});return{status:'success'};}catch(e){return{status:'error',message:e.toString()};}}
 function sendAdminAlert(data){try{MailApp.sendEmail(ADMIN_EMAIL,data.subject||'Skyflies Alert',data.message||'');return{status:'success'};}catch(e){return{status:'error'};}}</pre></div>
     <p id="cpOk" style="font-size:12px;color:var(--success);margin-top:6px;display:none;">✅ Copied!</p>
   </div>
@@ -1780,15 +1780,15 @@ async function sendQuotation(){
 }
 
 async function doSubmit(formEl,type,okId,erId){
-  var btn=formEl.querySelector('.sbtn');var bt=btn.querySelector('.bt');var bl=btn.querySelector('.spin,.spin');
+  var btn=formEl.querySelector('.submit-btn');var bt=btn?btn.querySelector('.bt'):null;var bl=btn?btn.querySelector('.bll,.spin'):null;
   document.getElementById(okId).classList.remove('show');document.getElementById(erId).classList.remove('show');
   var fd=new FormData(formEl),data={formType:type};
   for(var [k,v] of fd.entries()){if(k==='service')data.services=data.services?data.services+', '+v:v;else data[k]=v;}
   data.submittedAt=new Date().toISOString();
-  btn.disabled=true;bt.style.display='none';bl.style.display='block';
+  if(btn)btn.disabled=true;if(bt)bt.style.display='none';if(bl)bl.style.display='block';
   await new Promise(r=>setTimeout(r,800));
   saveLocal(data);await sendToSheet(data);
-  btn.disabled=false;bt.style.display='';bl.style.display='none';
+  if(btn)btn.disabled=false;if(bt)bt.style.display='';if(bl)bl.style.display='none';
   document.getElementById(okId).classList.add('show');
   formEl.reset();document.querySelectorAll('#planSel .plan-opt').forEach(o=>o.classList.remove('sel'));
   refreshDash();
@@ -1804,13 +1804,13 @@ async function doSubmit(formEl,type,okId,erId){
   var qf=document.getElementById('queryForm');if(!qf)return;
   qf.addEventListener('submit',async function(e){
     e.preventDefault();
-    var btn=this.querySelector('.sbtn');var bt=btn.querySelector('.bt');var bl=btn.querySelector('.spin,.spin');
+    var btn=this.querySelector('.submit-btn');var bt=btn?btn.querySelector('.bt'):null;var bl=btn?btn.querySelector('.bll,.spin'):null;
     var fd=new FormData(this),data={formType:'query',action:'addQuery',customerId:currentCustomer?currentCustomer.id:'',customerName:currentCustomer?currentCustomer.name:'',submittedAt:new Date().toISOString()};
     for(var [k,v] of fd.entries())data[k]=v;
-    btn.disabled=true;bt.style.display='none';bl.style.display='block';
+    if(btn)btn.disabled=true;if(bt)bt.style.display='none';if(bl)bl.style.display='block';
     await new Promise(r=>setTimeout(r,700));
     saveLocal(data);await sendToSheet(data);
-    btn.disabled=false;bt.style.display='';bl.style.display='none';
+    if(btn)btn.disabled=false;if(bt)bt.style.display='';if(bl)bl.style.display='none';
     document.getElementById('qry-ok').classList.add('show');this.reset();
     if(currentCustomer){
       var ld=JSON.parse(localStorage.getItem('cdata_'+currentCustomer.id)||'{}');
@@ -2115,15 +2115,15 @@ function clearData(){if(confirm('Clear all local submission data? (Google Sheet 
   var frm=document.getElementById('addCustForm');if(!frm)return;
   frm.addEventListener('submit',async function(e){
     e.preventDefault();
-    var btn=this.querySelector('.sbtn'),bt=btn.querySelector('.bt'),bl=btn.querySelector('.spin');
+    var btn=this.querySelector('.submit-btn'),bt=btn?btn.querySelector('.bt'):null,bl=btn?btn.querySelector('.bll,.spin'):null;
     document.getElementById('ac-ok').classList.remove('show');document.getElementById('ac-er').classList.remove('show');
     var fd=new FormData(this),data={action:'addCustomer'};for(var [k,v] of fd.entries())data[k]=v;
-    btn.disabled=true;bt.style.display='none';bl.style.display='block';await new Promise(r=>setTimeout(r,800));
+    if(btn)btn.disabled=true;if(bt)bt.style.display='none';if(bl)bl.style.display='block';await new Promise(r=>setTimeout(r,800));
     var success=false,wh=localStorage.getItem(WH)||WEBHOOK_URL;
     try{var r=await fetch(wh,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(data)});var res=await r.json();if(res.status==='success')success=true;}catch(err){success=true;}
     var lc=JSON.parse(localStorage.getItem('sf_customers')||'{}');
     lc[data.customerId]={pwd:data.password,name:data.name,phone:data.phone,email:data.email,city:data.city,address:data.address,systemSize:data.systemSize,panels:data.panels,installCost:data.installCost,amountPaid:data.amountPaid,plan:data.plan,billingCycle:data.billingCycle||'Monthly',nextService:data.nextService,systemStatus:data.systemStatus,installDate:data.installDate,notes:data.notes||'',subscriptions:[{name:(data.plan||'').split('–')[0].trim()||'Plan',price:(data.plan||'').split('–')[1]||'',billing:data.billingCycle||'Monthly',since:data.installDate||new Date().toLocaleDateString('en-IN'),status:'Active',features:['Panel cleaning','Inspection','Support']}],timeline:[{icon:'📞',title:'Enquiry Received',date:data.installDate||new Date().toLocaleDateString('en-IN'),desc:'Customer enquiry registered.',status:'done'},{icon:'💰',title:'Payment Received',date:data.installDate||new Date().toLocaleDateString('en-IN'),desc:'Install cost: '+data.installCost,status:'done'},{icon:'🔧',title:'Installation Completed',date:data.installDate||new Date().toLocaleDateString('en-IN'),desc:(data.systemSize||''),status:'done'},{icon:'✅',title:'System Active',date:data.installDate||new Date().toLocaleDateString('en-IN'),desc:'Status: '+(data.systemStatus||'Active'),status:'done'},{icon:'📅',title:'Next Service',date:data.nextService||'TBD',desc:'Scheduled maintenance.',status:'active'}],queries:[]};
-    localStorage.setItem('sf_customers',JSON.stringify(lc));btn.disabled=false;bt.style.display='';bl.style.display='none';
+    localStorage.setItem('sf_customers',JSON.stringify(lc));if(btn)btn.disabled=false;if(bt)bt.style.display='';if(bl)bl.style.display='none';
     if(success){document.getElementById('ac-ok').classList.add('show');this.reset();renderCustList();}else{document.getElementById('ac-er').classList.add('show');}
   });
 })();
