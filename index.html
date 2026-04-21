@@ -39,7 +39,7 @@
 html,body{height:100%;background:#0A0F1E;overflow:hidden;}
 #app{width:100%;height:100vh;height:100dvh;background:#0A0F1E;display:flex;flex-direction:column;overflow:hidden;}
 #topbar{flex:0 0 56px;height:56px;min-height:56px;background:#111827;display:flex;align-items:center;padding:0 16px;gap:10px;border-bottom:1px solid rgba(255,255,255,0.08);z-index:200;}
-#bottomnav{flex:0 0 52px;height:52px;min-height:52px;background:#111827;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:stretch;z-index:200;}
+#bottomnav{flex:0 0 52px;height:52px;min-height:52px;background:#111827;border-top:1px solid rgba(255,255,255,0.08);display:flex;align-items:stretch;z-index:200;}
 #screen-area{flex:1 1 0;min-height:0;overflow-y:scroll;overflow-x:hidden;-webkit-overflow-scrolling:touch;background:#0A0F1E;touch-action:pan-y;overscroll-behavior:contain;}
 
 
@@ -316,7 +316,7 @@ html,body{height:100%;background:#0A0F1E;overflow:hidden;}
 .soc-tab-btn.on{border-color:var(--sun);color:var(--sun);background:rgba(245,166,35,0.1);}
 .soc-content-area{display:none;}
 .soc-content-area.on{display:block;}
-.yt-scroll{display:flex;gap:10px;overflow-x:auto;padding-bottom:10px;scrollbar-width:none;}
+.yt-scroll{display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;padding-bottom:10px;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;}
 .yt-scroll::-webkit-scrollbar{display:none;}
 .yt-small{width:150px;flex-shrink:0;border-radius:10px;overflow:hidden;background:var(--card);cursor:pointer;}
 .yt-small img{width:150px;height:85px;object-fit:cover;display:block;}
@@ -1112,8 +1112,11 @@ async function fbQuery(c,f,v){if(!db)return[];try{var s=await db.collection(c).w
       <a href="https://youtube.com/@skyfliessolar" target="_blank" style="padding:7px 12px;background:rgba(255,0,0,0.2);border:1px solid rgba(255,0,0,0.4);border-radius:8px;color:#FF4444;font-size:12px;font-weight:700;text-decoration:none;">Subscribe</a>
     </div>
     <div id="ytPlayerBox" class="yt-player-box">
-      <div style="position:relative;width:100%;aspect-ratio:16/9;"><iframe id="ytPlayerFrame" src="" style="width:100%;height:100%;border:none;" allow="autoplay;encrypted-media" allowfullscreen></iframe></div>
-      <div class="yt-player-bar"><div id="ytPlayerTitle" class="yt-player-title"></div><button class="close-btn" onclick="closeYtPlayer()">✕ Close</button></div>
+      <div style="position:relative;width:100%;aspect-ratio:16/9;"><iframe id="ytPlayerFrame" src="" style="width:100%;height:100%;border:none;display:block;" allow="autoplay;encrypted-media;fullscreen" allowfullscreen></iframe></div>
+      <div class="yt-player-bar">
+        <div id="ytPlayerTitle" class="yt-player-title"></div>
+        <button onclick="closeYtPlayer()" style="padding:8px 16px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);border-radius:8px;color:#EF4444;font-weight:700;font-size:13px;cursor:pointer;flex-shrink:0;">✕ Close</button>
+      </div>
     </div>
     <div style="font-size:12px;font-weight:600;color:var(--soft);margin-bottom:8px;">▶ Swipe to browse</div>
     <div class="yt-scroll" id="ytScrollRow"><div style="min-width:140px;padding:20px;color:var(--soft);font-size:12px;">⏳ Loading...</div></div>
@@ -1131,7 +1134,7 @@ async function fbQuery(c,f,v){if(!db)return[];try{var s=await db.collection(c).w
   </div>
 
   <!-- Instagram -->
-  <div class="soc-content-area" id="soc-instagram" style="display:none;">
+  <div class="soc-content-area" id="soc-instagram">
     <div style="display:flex;align-items:center;gap:12px;background:rgba(225,48,108,0.07);border:1px solid rgba(225,48,108,0.2);border-radius:12px;padding:12px;margin-bottom:14px;">
       <div style="width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,rgba(253,89,73,0.3),rgba(214,36,159,0.3));display:flex;align-items:center;justify-content:center;font-size:22px;">📸</div>
       <div style="flex:1;"><div style="font-weight:700;font-size:14px;">@skyflies_solar</div><div style="font-size:11px;color:var(--soft);">Instagram</div></div>
@@ -1143,27 +1146,30 @@ async function fbQuery(c,f,v){if(!db)return[];try{var s=await db.collection(c).w
       <div class="ig-tile" style="background:rgba(255,255,255,0.04);" onclick="window.open('https://www.instagram.com/skyflies_solar/','_blank')">⭐<div style="font-size:9px;color:var(--soft);">Reviews</div></div>
       <div class="ig-tile" style="background:rgba(255,255,255,0.04);" onclick="window.open('https://www.instagram.com/skyflies_solar/','_blank')">🌱<div style="font-size:9px;color:var(--soft);">Green</div></div>
       <div class="ig-tile" style="background:rgba(255,255,255,0.04);" onclick="window.open('https://www.instagram.com/skyflies_solar/','_blank')">🏠<div style="font-size:9px;color:var(--soft);">Homes</div></div>
-      <div class="ig-tile" style="background:linear-gradient(135deg,rgba(253,89,73,0.15),rgba(214,36,159,0.15));" onclick="window.open('https://www.instagram.com/skyflies_solar/','_blank')" style="font-size:14px;color:#E1306C;font-weight:700;">+More</div>
+      <div class="ig-tile" style="background:linear-gradient(135deg,rgba(253,89,73,0.15),rgba(214,36,159,0.15));font-size:14px;color:#E1306C;font-weight:700;" onclick="window.open('https://www.instagram.com/skyflies_solar/','_blank')">+More</div>
     </div>
     <p style="font-size:12px;color:var(--soft);text-align:center;margin-bottom:12px;">Instagram blocks in-app embeds. Tap tiles to view our feed.</p>
     <a href="https://www.instagram.com/skyflies_solar" target="_blank" style="display:block;text-align:center;padding:13px;background:linear-gradient(135deg,#FD5949,#D6249F);border-radius:10px;color:#fff;font-weight:700;font-size:14px;text-decoration:none;">View All on Instagram →</a>
   </div>
 
   <!-- Facebook -->
-  <div class="soc-content-area" id="soc-facebook" style="display:none;">
+  <div class="soc-content-area" id="soc-facebook">
     <div style="display:flex;align-items:center;gap:12px;background:rgba(24,119,242,0.07);border:1px solid rgba(24,119,242,0.2);border-radius:12px;padding:12px;margin-bottom:14px;">
       <div style="width:44px;height:44px;background:rgba(24,119,242,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;">👍</div>
       <div style="flex:1;"><div style="font-weight:700;font-size:14px;">Skyflies Solar Solutions</div><div style="font-size:11px;color:var(--soft);">Facebook Page</div></div>
       <a href="https://m.facebook.com/979992808528445/" target="_blank" style="padding:7px 12px;background:rgba(24,119,242,0.2);border:1px solid rgba(24,119,242,0.4);border-radius:8px;color:#60A5FA;font-size:12px;font-weight:700;text-decoration:none;">Like Page</a>
     </div>
-    <div style="background:#fff;border-radius:12px;overflow:hidden;margin-bottom:12px;min-height:400px;">
-      <iframe src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2F979992808528445%2F&tabs=timeline&width=400&height=500&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=false" style="width:100%;min-height:500px;border:none;display:block;" scrolling="no" loading="lazy"></iframe>
+    <div style="background:linear-gradient(135deg,rgba(24,119,242,0.1),rgba(13,95,214,0.05));border:1px solid rgba(24,119,242,0.2);border-radius:14px;padding:24px;text-align:center;margin-bottom:12px;">
+      <div style="font-size:36px;margin-bottom:10px;">👍</div>
+      <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:6px;">Skyflies Solar Solutions</div>
+      <div style="font-size:12px;color:var(--soft);margin-bottom:14px;">Our latest updates, installation photos and customer stories on Facebook.</div>
+      <a href="https://m.facebook.com/979992808528445/" target="_blank" style="display:inline-block;padding:11px 24px;background:linear-gradient(135deg,#1877F2,#0D5FD6);border-radius:10px;color:#fff;font-weight:700;font-size:14px;text-decoration:none;">Open Facebook Page →</a>
     </div>
     <a href="https://m.facebook.com/979992808528445/" target="_blank" style="display:block;text-align:center;padding:13px;background:linear-gradient(135deg,#1877F2,#0D5FD6);border-radius:10px;color:#fff;font-weight:700;font-size:14px;text-decoration:none;">View on Facebook →</a>
   </div>
 
   <!-- LinkedIn -->
-  <div class="soc-content-area" id="soc-linkedin" style="display:none;">
+  <div class="soc-content-area" id="soc-linkedin">
     <div style="display:flex;align-items:center;gap:12px;background:rgba(0,119,181,0.07);border:1px solid rgba(0,119,181,0.2);border-radius:12px;padding:12px;margin-bottom:14px;">
       <div style="width:44px;height:44px;background:rgba(0,119,181,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;">💼</div>
       <div style="flex:1;"><div style="font-weight:700;font-size:14px;">Skyflies Solar Solutions</div><div style="font-size:11px;color:var(--soft);">LinkedIn Company</div></div>
@@ -1611,6 +1617,23 @@ function toggleAdminSetup() {
     if (el) el.value = wh;
     setTimeout(function(){ panel.scrollIntoView({behavior:'smooth',block:'nearest'}); }, 100);
   }
+}
+
+async function loadCustomersFromSheet() {
+  var wh = localStorage.getItem(WH) || WEBHOOK_URL;
+  if (!wh) return;
+  try {
+    var r = await fetch(wh, {method:'POST', headers:{'Content-Type':'text/plain'}, body: JSON.stringify({action:'getAllCustomers'})});
+    var res = await r.json();
+    if (res.status === 'success' && res.customers && res.customers.length) {
+      var lc = JSON.parse(localStorage.getItem('sf_customers') || '{}');
+      res.customers.forEach(function(c) {
+        if (c.id && !lc[c.id]) lc[c.id] = c; // only add new, don't overwrite local
+      });
+      localStorage.setItem('sf_customers', JSON.stringify(lc));
+      renderCustList();
+    }
+  } catch(e) {}
 }
 
 function showAdminSetup() {
@@ -2090,7 +2113,7 @@ function refreshDash(){
   var pending=JSON.parse(localStorage.getItem('sf_pending')||'[]').filter(p=>p.status==='pending');var pc=document.getElementById('pendCount');if(pc)pc.textContent=pending.length;
   renderTable(curFilter);renderCustList();renderActivityLog();
 }
-function filterTable(f,btn){curFilter=f;document.querySelectorAll('.fb2').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');renderTable(f);}
+function filterTable(f,btn){curFilter=f;document.querySelectorAll('.ptab').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');renderTable(f);}
 function renderTable(filter){
   var data=getLocal();if(filter!=='all')data=data.filter(d=>d.formType===filter);
   var tc=document.getElementById('tableContainer');if(!tc)return;
@@ -2153,12 +2176,14 @@ function renderQueries(){if(!currentCustomer)return;var q=currentCustomer.querie
 
 // ── SOCIAL MEDIA ──────────────────────────────────
 function showSocTab(tab, btn) {
-  document.querySelectorAll('.soc-content-area').forEach(function(el) { el.style.display = 'none'; el.classList.remove('on'); });
+  document.querySelectorAll('.soc-content-area').forEach(function(el) { el.classList.remove('on'); });
   document.querySelectorAll('.soc-tab-btn').forEach(function(el) { el.classList.remove('on'); });
   var el = document.getElementById('soc-' + tab);
-  if (el) { el.style.display = 'block'; el.classList.add('on'); }
+  if (el) el.classList.add('on');
   if (btn) btn.classList.add('on');
   if (tab === 'youtube') loadYouTubeVideos();
+  var sa = document.getElementById('screen-area');
+  if (sa) sa.scrollTo({top: sa.scrollTop, behavior: 'auto'}); // keep scroll position
 }
 
 // ── IN-APP YOUTUBE PLAYER ──────────────────────────
@@ -2267,8 +2292,16 @@ async function loadYouTubeVideos() {
       if (data.status === 'ok' && data.items && data.items.length) {
         videos = data.items.map(function(item) {
           var vid = '';
-          if (item.link) vid = (item.link.split('v=')[1] || item.link.split('/').pop() || '').split('&')[0];
-          if (!vid && item.guid) vid = (item.guid.split('v=')[1] || '').split('&')[0];
+          // Try link first: youtube.com/watch?v=ID or youtu.be/ID
+          if (item.link) {
+            var lm = item.link.match(/(?:v=|youtu\.be\/|shorts\/)([A-Za-z0-9_-]{11})/);
+            if (lm) vid = lm[1];
+          }
+          // Fallback: guid is typically "yt:video:VIDEO_ID"
+          if (!vid && item.guid) {
+            var gm = item.guid.match(/([A-Za-z0-9_-]{11})$/);
+            if (gm) vid = gm[1];
+          }
           return {
             id: vid,
             title: item.title || 'Skyflies Solar Video',
@@ -2281,36 +2314,32 @@ async function loadYouTubeVideos() {
     } catch (e) { console.log('RSS attempt ' + i + ' failed:', e); }
   }
 
-  // Always show channel embed as primary view regardless of API result
-  if (grid) {
-    if (videos.length) {
-      // API worked - show grid cards
-      ytVideosCache = videos;
-      ytLoaded = true;
-      renderYtVideos(videos);
-      return;
-    } else {
-      // API failed - show YouTube channel embed directly in the app
+  if (videos.length) {
+    ytVideosCache = videos;
+    ytLoaded = true;
+    renderYtVideos(videos);
+  } else {
+    // API failed – show scrollable channel topic cards (no iframe, no scroll block)
+    if (grid) {
       grid.innerHTML =
         '<div style="grid-column:1/-1;">' +
-          '<div style="background:var(--card);border:1px solid rgba(255,0,0,0.25);border-radius:16px;overflow:hidden;margin-bottom:16px;">' +
-            '<iframe src="https://www.youtube.com/embed?listType=user_uploads&list=skyfliessolar&autoplay=0" ' +
-              'style="width:100%;aspect-ratio:16/9;border:none;display:block;" ' +
-              'allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" ' +
-              'allowfullscreen loading="lazy"></iframe>' +
+          '<div style="background:linear-gradient(135deg,rgba(255,0,0,0.12),rgba(200,0,0,0.05));border:1px solid rgba(255,0,0,0.25);border-radius:16px;padding:20px;margin-bottom:16px;text-align:center;">' +
+            '<div style="font-size:36px;margin-bottom:8px;">▶</div>' +
+            '<div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:4px;">Skyflies Solar on YouTube</div>' +
+            '<div style="font-size:12px;color:var(--soft);margin-bottom:14px;">Solar installations, cleaning tips, energy savings & more</div>' +
+            '<a href="https://youtube.com/@skyfliessolar" target="_blank" style="display:inline-block;padding:11px 24px;background:#FF0000;border-radius:10px;color:#fff;font-weight:700;font-size:14px;text-decoration:none;">Open YouTube Channel ▶</a>' +
           '</div>' +
-          '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;">' +
-            ytChannelCards() +
-          '</div>' +
+          '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">' + ytChannelCards() + '</div>' +
         '</div>';
     }
+    if (row) row.innerHTML =
+      '<div style="min-width:220px;padding:10px 14px;">' +
+        '<a href="https://youtube.com/@skyfliessolar" target="_blank" style="display:flex;align-items:center;gap:8px;text-decoration:none;padding:10px 16px;background:rgba(255,0,0,0.15);border:1px solid rgba(255,0,0,0.3);border-radius:10px;">' +
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="#FF0000"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>' +
+          '<span style="color:#FF0000;font-weight:700;font-size:13px;">@skyfliessolar – Watch all videos →</span>' +
+        '</a>' +
+      '</div>';
   }
-  if (row) row.innerHTML = '<div style="min-width:200px;padding:12px 16px;">' +
-    '<a href="https://youtube.com/@skyfliessolar" target="_blank" ' +
-    'style="display:flex;align-items:center;gap:8px;text-decoration:none;padding:10px 16px;' +
-    'background:rgba(255,0,0,0.15);border:1px solid rgba(255,0,0,0.3);border-radius:10px;">' +
-    '<svg width="16" height="16" viewBox="0 0 24 24" fill="#FF0000"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>' +
-    '<span style="color:#FF0000;font-weight:700;font-size:13px;">@skyfliessolar — Watch all videos →</span></a></div>';
 }
 
 function ytChannelCards() {
@@ -3438,7 +3467,7 @@ function ensurePortalVisible() {
     if(portal) portal.style.display = 'block';
   } else {
     // Always show login form - force it visible
-    loginBox.style.cssText = 'display:block !important';
+    loginBox.style.display = 'block';
     if(portal) portal.style.display = 'none';
   }
 }
