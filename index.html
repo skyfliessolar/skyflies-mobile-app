@@ -2998,7 +2998,10 @@ function renderProducts(products) {
     card.setAttribute('data-id', p.id);
     var icon = catIcons[p.cat] || '📦';
     var imgEl = p.img
-      ? '<img src="' + p.img + '" style="width:100%;aspect-ratio:1;object-fit:cover;">'
+      ? '<div style="position:relative;width:100%;aspect-ratio:1;background:rgba(245,166,35,0.08);overflow:hidden;display:flex;align-items:center;justify-content:center;">' +
+          '<span style="font-size:36px;position:absolute;">' + icon + '</span>' +
+          '<img src="' + p.img + '" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;" onerror="this.style.display=\'none\'">' +
+        '</div>'
       : '<div style="width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:36px;background:rgba(245,166,35,0.08);">' + icon + '</div>';
     var stockBadge = p.stock==='out'
       ? '<span class="prod-badge out">Out of Stock</span>'
