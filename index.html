@@ -264,7 +264,7 @@ html,body{height:100%;background:#0A0F1E;overflow:hidden;}
 .tl-badge.pending{background:rgba(255,255,255,0.06);color:var(--soft);}
 
 /* ── ADMIN ── */
-.admin-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+.admin-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;touch-action:pan-y;}
 .astat{background:var(--card);border-radius:12px;padding:12px;text-align:center;position:relative;overflow:hidden;}
 .astat::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
 .astat.or::after{background:linear-gradient(90deg,var(--sun),var(--solar));}
@@ -280,7 +280,7 @@ html,body{height:100%;background:#0A0F1E;overflow:hidden;}
 .astat.cy .astat-val{color:#22D3EE;}
 .astat.rd .astat-val{color:#F87171;}
 .astat-lbl{font-size:10px;color:var(--soft);margin-top:2px;}
-.admin-action-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.admin-action-row{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;touch-action:pan-x;}
 .admin-btn{padding:9px 14px;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;border:none;}
 .admin-btn.primary{background:linear-gradient(135deg,var(--sun),var(--solar));color:#0A0F1E;}
 .admin-btn.secondary{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#fff;}
@@ -2147,7 +2147,7 @@ function renderTable(filter){
   var data=getLocal();if(filter!=='all')data=data.filter(d=>d.formType===filter);
   var tc=document.getElementById('tableContainer');if(!tc)return;
   if(!data.length){tc.innerHTML='<div style="text-align:center;padding:30px;color:var(--soft);font-size:13px;">No submissions yet.</div>';return;}
-  var html='<div style="overflow-x:auto;"><table class="dtbl"><thead><tr><th>Time</th><th>Type</th><th>Name</th><th>Phone</th><th>Email</th><th>City</th><th>Detail</th></tr></thead><tbody>';
+  var html='<div style="overflow-x:auto;touch-action:pan-x;scrollbar-width:none;"><table class="dtbl"><thead><tr><th>Time</th><th>Type</th><th>Name</th><th>Phone</th><th>Email</th><th>City</th><th>Detail</th></tr></thead><tbody>';
   data.forEach(d=>{var ts=d.submittedAt?new Date(d.submittedAt).toLocaleString('en-IN',{timeZone:'Asia/Kolkata',day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'–';var detail=d.formType==='subscribe'?'Plan: '+(d.plan||'–'):d.formType==='emi'?'EMI: '+(d.emi||'–'):d.formType==='query'?'Query: '+(d.queryType||'–'):(d.propertyType||'–');var btype=d.formType==='enquiry'?'enq':d.formType==='quotation'?'quot':d.formType==='subscribe'?'sub':'loan';var blabel={'enquiry':'Enquiry','quotation':'Quotation','subscribe':'Subscription','emi':'EMI','query':'Query'}[d.formType]||d.formType;html+=`<tr><td>${ts}</td><td><span class="badge ${btype}">${blabel}</span></td><td>${d.name||d.customerId||'–'}</td><td>${d.phone||'–'}</td><td>${d.email||'–'}</td><td>${d.city||'–'}</td><td>${detail}</td></tr>`;});
   html+='</tbody></table></div>';tc.innerHTML=html;
 }
@@ -2155,7 +2155,7 @@ function renderCustList(){
   var lc=JSON.parse(localStorage.getItem('sf_customers')||'{}'),keys=Object.keys(lc);
   var cl=document.getElementById('custListContainer');if(!cl)return;
   if(!keys.length){cl.innerHTML='<div style="text-align:center;padding:30px;color:var(--soft);font-size:13px;">No customer accounts yet.</div>';return;}
-  var html='<div style="overflow-x:auto;"><table class="dtbl"><thead><tr><th>ID</th><th>Name</th><th>Phone</th><th>Email</th><th>City</th><th>System</th><th>Plan</th><th>Install Cost</th><th>Status</th></tr></thead><tbody>';
+  var html='<div style="overflow-x:auto;touch-action:pan-x;scrollbar-width:none;"><table class="dtbl"><thead><tr><th>ID</th><th>Name</th><th>Phone</th><th>Email</th><th>City</th><th>System</th><th>Plan</th><th>Install Cost</th><th>Status</th></tr></thead><tbody>';
   keys.forEach(id=>{var c=lc[id];html+=`<tr><td><strong style="color:var(--sun);">${id}</strong></td><td>${c.name||'–'}</td><td>${c.phone||'–'}</td><td>${c.email||'–'}</td><td>${c.city||'–'}</td><td>${c.systemSize||'–'}</td><td style="color:var(--sun);">${c.plan||'–'}</td><td>${c.installCost||'–'}</td><td>${c.systemStatus||'Active'}</td></tr>`;});
   html+='</tbody></table></div>';cl.innerHTML=html;
 }
