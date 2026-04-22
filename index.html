@@ -31,6 +31,43 @@
 <meta name="twitter:title" content="Skyflies Solar – Solar Installation & AMC">
 <meta name="twitter:description" content="Search Skyflies Solar on Google and install our app. Solar installation, cleaning & AMC services in Tamil Nadu.">
 <meta name="twitter:image" content="https://skyflies.in/wp-content/uploads/2025/12/Sky-Flies-Solar.png">
+<!-- JSON-LD Structured Data for Google Search -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "MobileApplication",
+  "name": "Skyflies Solar App",
+  "alternateName": ["Skyflies App", "Skyflies Solar", "Skyflies"],
+  "description": "Skyflies Solar – Solar panel installation, cleaning, AMC and customer portal in Tamil Nadu. Get instant solar quotes, track your system and contact our team.",
+  "url": "https://skyfliessolar.github.io/skyflies-mobile-app/",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Android, iOS, Web",
+  "offers": {"@type": "Offer", "price": "0", "priceCurrency": "INR"},
+  "author": {"@type": "Organization", "name": "Skyflies Solar Solutions", "url": "https://skyflies.in", "telephone": "+919385449167", "address": {"@type": "PostalAddress", "addressRegion": "Tamil Nadu", "addressCountry": "IN"}},
+  "screenshot": "https://skyflies.in/wp-content/uploads/2025/12/Sky-Flies-Solar.png",
+  "installUrl": "https://skyfliessolar.github.io/skyflies-mobile-app/"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "Skyflies Solar Solutions",
+  "alternateName": "Skyflies Solar",
+  "description": "Solar panel installation, cleaning, AMC services in Tamil Nadu. Download the Skyflies App for instant quotes and customer portal.",
+  "url": "https://skyflies.in",
+  "telephone": "+919385449167",
+  "image": "https://skyflies.in/wp-content/uploads/2025/12/Sky-Flies-Solar.png",
+  "address": {"@type": "PostalAddress", "addressRegion": "Tamil Nadu", "addressCountry": "IN"},
+  "areaServed": ["Chennai", "Vellore", "Ranipet", "Kanchipuram", "Tamil Nadu"],
+  "sameAs": ["https://skyfliessolar.github.io/skyflies-mobile-app/"],
+  "hasOfferCatalog": {"@type": "OfferCatalog", "name": "Solar Services", "itemListElement": [
+    {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Solar Panel Installation"}},
+    {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Solar Panel Cleaning"}},
+    {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Solar AMC"}}
+  ]}
+}
+</script>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="https://skyflies.in/wp-content/uploads/2025/12/Sky-Flies-Solar.png">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -1583,6 +1620,8 @@ function adminLogin(){
       document.getElementById('adminLoginBox').style.display='none';
       document.getElementById('adminDash').style.display='block';
       pwdInput.value='';
+      // Scroll to top so dashboard is visible immediately
+      var sa=document.getElementById('screen-area');if(sa)sa.scrollTo({top:0,behavior:'instant'});
       refreshDash();renderCustList();renderAdminMediaList();
       // Pre-fill setup URL
       var whEl = document.getElementById('whUrl');
