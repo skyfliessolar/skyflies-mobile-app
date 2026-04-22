@@ -906,7 +906,7 @@ async function fbQuery(c,f,v){if(!db)return[];try{var s=await db.collection(c).w
   </div>
 
   <!-- Category pills -->
-  <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px;scrollbar-width:none;" id="catPills">
+  <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px;scrollbar-width:none;touch-action:pan-x;" id="catPills">
     <button class="cat-pill on" onclick="filterCat('all',this)">All</button>
     <button class="cat-pill" onclick="filterCat('panels',this)">☀️ Panels</button>
     <button class="cat-pill" onclick="filterCat('inverters',this)">⚡ Inverters</button>
@@ -1375,7 +1375,7 @@ async function fbQuery(c,f,v){if(!db)return[];try{var s=await db.collection(c).w
     <h3>📄 Apps Script Code</h3>
     <p style="font-size:12px;color:var(--soft);margin-bottom:8px;">Copy and paste into Apps Script, then deploy as Web App:</p>
     <div class="code-box"><button class="copy-btn" onclick="cpCode()">COPY</button><pre id="gasCd">// ════════════════════════════════════════
-// SKYFLIES SOLAR – APPS SCRIPT CRM v7
+// SKYFLIES SOLAR – APPS SCRIPT CRM v8
 // Deploy: Execute as Me | Access: Anyone
 // ════════════════════════════════════════
 
@@ -1384,20 +1384,23 @@ var ADMIN_EMAIL = 'info@skyflies.in';
 function doPost(e) {
   try {
     var data = JSON.parse(e.postData.contents);
+    // Email-only actions — handle BEFORE getActiveSpreadsheet() so they work on standalone scripts
+    if (data.action === 'sendOTP') return respond(sendOTP(data));
+    if (data.action === 'adminAlert') return respond(sendAdminAlert(data));
+    if (data.action === 'sendWelcomeEmail') return respond(sendWelcomeEmail(data));
+    // Actions that need the spreadsheet
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     if (data.action === 'getCustomer') return respond(getCustomer(ss, data));
     if (data.action === 'addCustomer') return respond(addCustomer(ss, data));
     if (data.action === 'addQuery') return respond(addQuery(ss, data));
     if (data.action === 'registerCustomer') return respond(saveRegistration(ss, data));
     if (data.action === 'getPending') return respond(getPending(ss, data));
-    if (data.action === 'sendOTP') return respond(sendOTP(ss, data));
     if (data.action === 'getCustomerByEmail') return respond(getCustomerByEmail(ss, data));
     if (data.action === 'updatePassword') return respond(updatePassword(ss, data));
     if (data.action === 'approveCustomer') return respond(approveCustomer(ss, data));
     if (data.action === 'getAllCustomers') return respond(getAllCustomers(ss, data));
-    if (data.action === 'sendWelcomeEmail') return respond(sendWelcomeEmail(ss, data));
-    if (data.action === 'adminAlert') return respond(sendAdminAlert(data));
     if (data.action === 'sendPushNotification') return respond(sendBulkNotification(ss, data));
+    if (data.action === 'loginEvent') return respond({status:'success'});
     return respond(handleForm(ss, data));
   } catch(err) {
     return respond({status:'error', message:err.toString()});
@@ -1405,7 +1408,7 @@ function doPost(e) {
 }
 
 function doGet() {
-  return respond({status:'ok', app:'Skyflies Solar CRM v7'});
+  return respond({status:'ok', app:'Skyflies Solar CRM v8'});
 }
 
 function sendBulkNotification(ss, data) {
@@ -1458,12 +1461,12 @@ function addCustomer(ss,data){var headers=['Customer ID','Name','Password','Phon
 function saveRegistration(ss,data){var headers=['#','Time','Name','Phone','Email','City','Password','RegID','Status','Notes'];var sh=getOrCreate(ss,'Pending Registrations',headers);sh.appendRow([sh.getLastRow(),new Date().toLocaleString('en-IN',{timeZone:'Asia/Kolkata'}),data.name,data.phone,data.email,data.city||'',data.password,data.regId||'','Pending Approval','Awaiting admin review']);try{MailApp.sendEmail(ADMIN_EMAIL,'⏳ New Registration – '+data.name,'Name: '+data.name+'\nPhone: '+data.phone+'\nEmail: '+data.email);}catch(e){}return{status:'success'};}
 function getPending(ss,data){var sh=ss.getSheetByName('Pending Registrations');if(!sh)return{status:'success',pending:[]};var rows=sh.getDataRange().getValues();var out=[];for(var i=1;i<rows.length;i++){var st=String(rows[i][8]||'').toLowerCase();if(st.indexOf('pending')!==-1){out.push({regId:String(rows[i][7]||'ROW-'+i),name:String(rows[i][2]||''),phone:String(rows[i][3]||''),email:String(rows[i][4]||''),city:String(rows[i][5]||''),password:String(rows[i][6]||''),submittedAt:String(rows[i][1]||''),rowIndex:i});}}return{status:'success',pending:out};}
 function approveCustomer(ss,data){var sh=ss.getSheetByName('Pending Registrations');if(sh){var rows=sh.getDataRange().getValues();for(var i=1;i<rows.length;i++){if(String(rows[i][7]).trim()===String(data.regId).trim()||(data.phone&&String(rows[i][3]).trim()===String(data.phone).trim())){sh.getRange(i+1,9).setValue('Approved');break;}}}return addCustomer(ss,data);}
-function sendOTP(ss,data){try{MailApp.sendEmail({to:data.email,subject:'Your Skyflies Solar OTP – '+data.otp,htmlBody:'<div style="font-family:Arial;max-width:480px;margin:0 auto;"><div style="background:#F5A623;padding:16px;border-radius:10px 10px 0 0;text-align:center;"><h2 style="color:#080F1E;margin:0;">☀️ Skyflies Solar</h2></div><div style="background:#f9f9f9;padding:24px;border-radius:0 0 10px 10px;"><p>Your OTP:</p><div style="background:#fff;border:2px solid #F5A623;border-radius:10px;padding:20px;text-align:center;"><h1 style="color:#FF6B00;font-size:40px;letter-spacing:10px;margin:0;">'+data.otp+'</h1></div><p style="font-size:12px;color:#666;">Valid 5 minutes. Do not share.</p></div></div>'});return{status:'success'};}catch(e){return{status:'error',message:e.toString()};}}
+function sendOTP(data){try{MailApp.sendEmail({to:data.email,subject:'Your Skyflies Solar OTP – '+data.otp,htmlBody:'<div style="font-family:Arial;max-width:480px;margin:0 auto;"><div style="background:#F5A623;padding:16px;border-radius:10px 10px 0 0;text-align:center;"><h2 style="color:#080F1E;margin:0;">☀️ Skyflies Solar</h2></div><div style="background:#f9f9f9;padding:24px;border-radius:0 0 10px 10px;"><p>Hi '+data.name+', your OTP to create your Skyflies Solar account:</p><div style="background:#fff;border:2px solid #F5A623;border-radius:10px;padding:20px;text-align:center;"><h1 style="color:#FF6B00;font-size:40px;letter-spacing:10px;margin:0;">'+data.otp+'</h1></div><p style="font-size:12px;color:#666;">Valid for 5 minutes. Do not share this OTP with anyone.</p></div></div>'});return{status:'success'};}catch(e){return{status:'error',message:e.toString()};}}
 function getCustomerByEmail(ss,data){var sh=ss.getSheetByName('Customer Logins');if(!sh)return{status:'error',message:'No accounts'};var rows=sh.getDataRange().getValues();for(var i=1;i<rows.length;i++){if(String(rows[i][4]).trim().toLowerCase()===String(data.email).trim().toLowerCase()){return{status:'success',customer:{id:rows[i][0],name:rows[i][1],password:rows[i][2],phone:rows[i][3],email:rows[i][4],city:rows[i][5],address:rows[i][6],systemSize:rows[i][7],panels:rows[i][8],installCost:rows[i][9],amountPaid:rows[i][10],plan:rows[i][11],billingCycle:rows[i][12],nextService:rows[i][13],systemStatus:rows[i][14],installDate:rows[i][15],notes:rows[i][16]||''}};}}return{status:'error',message:'Email not found'};}
 function updatePassword(ss,data){var sh=ss.getSheetByName('Customer Logins');if(!sh)return{status:'error'};var rows=sh.getDataRange().getValues();for(var i=1;i<rows.length;i++){if(String(rows[i][4]).trim().toLowerCase()===String(data.email).trim().toLowerCase()){sh.getRange(i+1,3).setValue(data.newPassword);return{status:'success'};}}return{status:'error'};}
 function addQuery(ss,data){var headers=['#','Time','Customer ID','Name','Type','Priority','Message','Status','Response'];var sh=getOrCreate(ss,'Customer Queries',headers);sh.appendRow([sh.getLastRow(),new Date().toLocaleString('en-IN',{timeZone:'Asia/Kolkata'}),data.customerId,data.customerName||'',data.queryType,data.priority||'Normal',data.message,'Open','']);try{MailApp.sendEmail(ADMIN_EMAIL,'Query – '+(data.customerName||data.customerId)+' | '+data.queryType,data.message);}catch(e){}return{status:'success'};}
 function getAllCustomers(ss,data){var sh=ss.getSheetByName('Customer Logins');if(!sh)return{status:'success',customers:[]};var rows=sh.getDataRange().getValues();var out=[];for(var i=1;i<rows.length;i++){if(!String(rows[i][0]).trim())continue;out.push({id:rows[i][0],name:rows[i][1],password:rows[i][2],phone:rows[i][3],email:rows[i][4],city:rows[i][5],address:rows[i][6],systemSize:rows[i][7],panels:rows[i][8],installCost:rows[i][9],amountPaid:rows[i][10],plan:rows[i][11],billingCycle:rows[i][12],nextService:rows[i][13],systemStatus:rows[i][14],installDate:rows[i][15],notes:rows[i][16]||''});}return{status:'success',customers:out};}
-function sendWelcomeEmail(ss,data){try{MailApp.sendEmail({to:data.email,subject:'✅ Welcome to Skyflies Solar! Your ID: '+data.customerId,htmlBody:'<div style="font-family:Arial;max-width:500px;margin:0 auto;"><div style="background:#F5A623;padding:16px;border-radius:10px 10px 0 0;text-align:center;"><h2 style="color:#080F1E;margin:0;">☀️ Welcome to Skyflies Solar!</h2></div><div style="background:#f9f9f9;padding:24px;border-radius:0 0 10px 10px;"><p>Hi '+data.name+', your account is ready!</p><div style="background:#fff;border:2px solid #F5A623;border-radius:10px;padding:16px;text-align:center;"><h1 style="color:#FF6B00;font-size:32px;letter-spacing:4px;margin:0;">'+data.customerId+'</h1></div><p style="font-size:12px;color:#666;">Login with your phone or email + password.<br>Our team will contact you for a free site survey.</p><a href="https://skyfliessolar.github.io/skyflies-mobile-app/" style="display:inline-block;background:#F5A623;color:#080F1E;padding:10px 24px;border-radius:8px;font-weight:700;text-decoration:none;">Open My Account →</a></div></div>'});return{status:'success'};}catch(e){return{status:'error',message:e.toString()};}}
+function sendWelcomeEmail(data){try{MailApp.sendEmail({to:data.email,subject:'✅ Welcome to Skyflies Solar! Your ID: '+data.customerId,htmlBody:'<div style="font-family:Arial;max-width:500px;margin:0 auto;"><div style="background:#F5A623;padding:16px;border-radius:10px 10px 0 0;text-align:center;"><h2 style="color:#080F1E;margin:0;">☀️ Welcome to Skyflies Solar!</h2></div><div style="background:#f9f9f9;padding:24px;border-radius:0 0 10px 10px;"><p>Hi '+data.name+', your account is ready!</p><div style="background:#fff;border:2px solid #F5A623;border-radius:10px;padding:16px;text-align:center;"><h1 style="color:#FF6B00;font-size:32px;letter-spacing:4px;margin:0;">'+data.customerId+'</h1></div><p style="font-size:12px;color:#666;">Login with your phone or email + password.<br>Our team will contact you for a free site survey.</p><a href="https://skyfliessolar.github.io/skyflies-mobile-app/" style="display:inline-block;background:#F5A623;color:#080F1E;padding:10px 24px;border-radius:8px;font-weight:700;text-decoration:none;">Open My Account →</a></div></div>'});return{status:'success'};}catch(e){return{status:'error',message:e.toString()};}}
 function sendAdminAlert(data){try{MailApp.sendEmail(ADMIN_EMAIL,data.subject||'Skyflies Alert',data.message||'');return{status:'success'};}catch(e){return{status:'error'};}}</pre></div>
     <p id="cpOk" style="font-size:12px;color:var(--success);margin-top:6px;display:none;">✅ Copied!</p>
   </div>
@@ -1956,8 +1959,10 @@ async function startRegistration(){
   var otp=Math.floor(100000+Math.random()*900000).toString(),expires=Date.now()+5*60*1000,hashedPwd=await hashPassword(pwd);
   regOtpStore={otp,email,name,phone,city,pwd:hashedPwd,expires};
   var wh=localStorage.getItem(WH)||WEBHOOK_URL;
-  try{await fetch(wh,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'sendOTP',email,otp,subject:'Verify your Skyflies Solar Account – OTP: '+otp,purpose:'registration',name})});}catch(e){}
+  var otpSent=false;
+  try{var otpR=await fetch(wh,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'sendOTP',email,otp,subject:'Verify your Skyflies Solar Account – OTP: '+otp,purpose:'registration',name})});var otpRes=await otpR.json();if(otpRes.status==='success')otpSent=true;}catch(e){}
   btn.style.display='';loader.style.display='none';
+  if(!otpSent){showToast('⚠️ OTP email may be delayed — check spam folder or contact us',5000);}
   document.getElementById('regStep1').style.display='none';document.getElementById('regStep2').style.display='';
   document.getElementById('regEmailShow').textContent=email;document.getElementById('regOtpInput').value='';document.getElementById('regOtpInput').focus();
   if(regOtpTimerInterval)clearInterval(regOtpTimerInterval);
@@ -2066,8 +2071,11 @@ async function sendResetOTP(){
   var rl=checkRateLimit('fp_'+email);if(rl.blocked){errEl.textContent='❌ '+rl.message;errEl.classList.add('show');return;}
   var btn=document.getElementById('fpSendTxt'),loader=document.getElementById('fpSendLoader');btn.style.display='none';loader.style.display='block';
   var otp=Math.floor(100000+Math.random()*900000).toString(),expires=Date.now()+5*60*1000;resetOtpStore={otp,email,expires};
-  var wh=localStorage.getItem(WH)||WEBHOOK_URL;try{await fetch(wh,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'sendOTP',email,otp})});}catch(e){}
+  var wh=localStorage.getItem(WH)||WEBHOOK_URL;
+  var fpSent=false;
+  try{var fpR=await fetch(wh,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'sendOTP',email,otp,name:'Customer'})});var fpRes=await fpR.json();if(fpRes.status==='success')fpSent=true;}catch(e){}
   btn.style.display='';loader.style.display='none';
+  if(!fpSent){showToast('⚠️ OTP email may be delayed — check spam folder',4000);}
   document.getElementById('fpStep1').style.display='none';document.getElementById('fpStep2').style.display='';document.getElementById('fpEmailShow').textContent=email;document.getElementById('fpOtpCode').focus();
   if(resetOtpTimerInterval)clearInterval(resetOtpTimerInterval);
   var timerEl=document.getElementById('fpTimer');resetOtpTimerInterval=setInterval(function(){var rem=Math.max(0,expires-Date.now());var m=Math.floor(rem/60000);var s=Math.floor((rem%60000)/1000);if(timerEl)timerEl.textContent=m+':'+String(s).padStart(2,'0');if(rem<=0){clearInterval(resetOtpTimerInterval);resetOtpStore=null;if(timerEl)timerEl.textContent='Expired';}},1000);
@@ -2184,8 +2192,9 @@ function showSocTab(tab, btn) {
   if (el) el.classList.add('on');
   if (btn) btn.classList.add('on');
   if (tab === 'youtube') loadYouTubeVideos();
+  // Always scroll back to top so user doesn't see blank space after switching tabs
   var sa = document.getElementById('screen-area');
-  if (sa) sa.scrollTo({top: sa.scrollTop, behavior: 'auto'}); // keep scroll position
+  if (sa) sa.scrollTo({top: 0, behavior: 'instant'});
 }
 
 // ── IN-APP YOUTUBE PLAYER ──────────────────────────
