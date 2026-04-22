@@ -1363,7 +1363,10 @@ async function fbQuery(c,f,v){if(!db)return[];try{var s=await db.collection(c).w
     <p style="font-size:12px;color:var(--soft);line-height:1.6;margin-bottom:8px;">Deploy your Apps Script as a Web App, paste the URL here.</p>
     <div class="setup-row"><input type="url" id="whUrl" class="setup-input" placeholder="Paste Apps Script URL..."><button class="save-btn" onclick="saveWh()">Save</button></div>
     <div class="setup-status" id="whSt"></div>
-    <button onclick="testConnection()" style="margin-top:8px;padding:9px 16px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);border-radius:8px;color:#60A5FA;font-size:13px;font-weight:600;cursor:pointer;">🔌 Test Connection</button>
+    <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+      <button onclick="testConnection()" style="padding:9px 16px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);border-radius:8px;color:#60A5FA;font-size:13px;font-weight:600;cursor:pointer;">🔌 Test Connection</button>
+      <button onclick="testOTPEmail()" style="padding:9px 16px;background:rgba(245,166,35,0.1);border:1px solid rgba(245,166,35,0.3);border-radius:8px;color:#F5A623;font-size:13px;font-weight:600;cursor:pointer;">📧 Send Test OTP Email</button>
+    </div>
     <div id="testResult" style="margin-top:8px;font-size:12px;"></div>
   </div>
   <div class="setup-card">
@@ -1918,8 +1921,26 @@ async function testConnection(){
   try{var r=await fetch(wh,{method:'GET'});var data=await r.json();if(data.status==='ok'){res.textContent='✅ Connected! '+data.app;res.style.color='#00E676';}else{res.textContent='⚠️ Connected but unexpected: '+JSON.stringify(data);res.style.color='#F5A623';}}
   catch(e){try{await fetch(wh,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({formType:'test',name:'Test'})});res.textContent='✅ Connected via POST!';res.style.color='#00E676';}catch(e2){res.textContent='❌ Cannot connect: '+e.message;res.style.color='#FF5252';}}
 }
+async function testOTPEmail(){
+  var res=document.getElementById('testResult');
+  var wh=localStorage.getItem(WH)||WEBHOOK_URL;
+  if(!wh){res.textContent='❌ No webhook URL saved.';res.style.color='#FF5252';return;}
+  var email=prompt('Enter email to receive test OTP:','');
+  if(!email||!email.includes('@')){res.textContent='❌ Cancelled or invalid email.';res.style.color='#FF5252';return;}
+  var otp=String(Math.floor(100000+Math.random()*900000));
+  res.textContent='⏳ Sending test OTP to '+email+'...';res.style.color='#F5A623';
+  try{
+    var r=await fetch(wh,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'sendOTP',email:email,otp:otp,name:'Test User'})});
+    var data=await r.json();
+    if(data.status==='success'){res.textContent='✅ OTP '+otp+' sent to '+email+'! Check inbox (and spam).';res.style.color='#00E676';}
+    else{res.textContent='❌ Apps Script error: '+(data.message||JSON.stringify(data));res.style.color='#FF5252';}
+  }catch(e){res.textContent='❌ Fetch failed: '+e.message;res.style.color='#FF5252';}
+}
 window.addEventListener('load',function(){
-  if(!localStorage.getItem(WH))localStorage.setItem(WH,WEBHOOK_URL);
+  // Always upgrade to latest WEBHOOK_URL (clears any old cached URL from localStorage)
+  var OLD_URLS=['https://script.google.com/macros/s/AKfycbwPf','https://script.google.com/macros/s/AKfycbywkZCqEqLe2roMNmujGUicDbvrkezpk-pP2pl1C7YmO_fdWP59A7gr3G81yCrPO7j3/exec'];
+  var saved=localStorage.getItem(WH);
+  if(!saved||OLD_URLS.some(function(u){return saved.indexOf(u)!==-1;})||saved!==WEBHOOK_URL){localStorage.setItem(WH,WEBHOOK_URL);}
   var wh=localStorage.getItem(WH);var el=document.getElementById('whUrl');
   if(el){el.value=wh;var st=document.getElementById('whSt');if(st){st.textContent='✅ Google Sheet connected.';st.className='wst ok';}}
   var session=getSession();
