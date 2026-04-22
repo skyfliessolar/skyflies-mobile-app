@@ -1,9 +1,9 @@
 {
   "name": "Skyflies Solar",
   "short_name": "Skyflies Solar",
-  "description": "Skyflies Solar – Solar Installation, Cleaning, AMC & Customer Portal in Tamil Nadu. Search Skyflies on Google to download the app.",
-  "start_url": "/skyflies-mobile-app/",
-  "scope": "/skyflies-mobile-app/",
+  "description": "Skyflies Solar – Solar Installation, Cleaning, AMC & Customer Portal in Tamil Nadu. Search Skyflies App on Google to install.",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#080F1E",
@@ -51,21 +51,21 @@
       "name": "Get Free Quote",
       "short_name": "Quote",
       "description": "Get a solar quote instantly",
-      "url": "/skyflies-mobile-app/?page=calculator",
+      "url": "/?page=calculator",
       "icons": [{"src": "https://skyflies.in/wp-content/uploads/2025/12/Sky-Flies-Solar.png", "sizes": "96x96"}]
     },
     {
       "name": "My Account",
       "short_name": "Account",
       "description": "Customer portal login",
-      "url": "/skyflies-mobile-app/?page=portal",
+      "url": "/?page=portal",
       "icons": [{"src": "https://skyflies.in/wp-content/uploads/2025/12/Sky-Flies-Solar.png", "sizes": "96x96"}]
     },
     {
       "name": "Enquiry",
       "short_name": "Enquiry",
       "description": "Send an enquiry",
-      "url": "/skyflies-mobile-app/?page=enquiry",
+      "url": "/?page=enquiry",
       "icons": [{"src": "https://skyflies.in/wp-content/uploads/2025/12/Sky-Flies-Solar.png", "sizes": "96x96"}]
     }
   ]

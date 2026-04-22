@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://skyfliessolar.github.io/skyflies-mobile-app/sitemap.xml
+Sitemap: https://skyflies-app.in/sitemap.xml
