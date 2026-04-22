@@ -274,8 +274,8 @@ html,body{height:100%;background:#0A0F1E;overflow:hidden;}
 .ptab{padding:8px 14px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:var(--soft);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;}
 .ptab.on{background:rgba(245,166,35,0.15);border-color:var(--sun);color:var(--sun);}
 .ptab-content{display:none;}
-.ptab-content.on{display:block;animation:fadeUp 0.2s ease;}
-.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.ptab-content.on{display:block;animation:fadeUp 0.2s ease;touch-action:pan-y;}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;touch-action:pan-y;}
 .info-card{background:var(--card);border-radius:12px;padding:12px;}
 .info-lbl{font-size:9px;color:var(--sun);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;}
 .info-val{font-size:14px;font-weight:700;}
@@ -352,7 +352,7 @@ html,body{height:100%;background:#0A0F1E;overflow:hidden;}
 .soc-tab-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:var(--soft);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;}
 .soc-tab-btn.on{border-color:var(--sun);color:var(--sun);background:rgba(245,166,35,0.1);}
 .soc-content-area{display:none;}
-.soc-content-area.on{display:block;}
+.soc-content-area.on{display:block;touch-action:pan-y;}
 .yt-scroll{display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;padding-bottom:10px;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;touch-action:pan-x;}
 .yt-scroll::-webkit-scrollbar{display:none;}
 .yt-small{width:150px;flex-shrink:0;border-radius:10px;overflow:hidden;background:var(--card);cursor:pointer;}
@@ -371,7 +371,7 @@ html,body{height:100%;background:#0A0F1E;overflow:hidden;}
 .yt-card-info{padding:9px;}
 .yt-card-title{font-size:12px;font-weight:600;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:4px;}
 .yt-card-meta{font-size:10px;color:var(--soft);}
-.ig-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;border-radius:12px;overflow:hidden;margin-bottom:12px;}
+.ig-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;border-radius:12px;overflow:hidden;margin-bottom:12px;touch-action:pan-y;}
 .ig-tile{aspect-ratio:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:5px;cursor:pointer;font-size:24px;}
 .ig-tile:active{opacity:0.7;}
 
@@ -809,8 +809,6 @@ async function fbQuery(c,f,v){if(!db)return[];try{var s=await db.collection(c).w
     <div class="social-link-card" onclick="goScreen('store')"><div class="soc-ico" style="background:rgba(245,166,35,0.15);">🛒</div><div><div class="soc-info-name">Solar Store</div><div class="soc-info-sub">Products & appliances</div></div><div class="soc-arrow">›</div></div>
     <div class="social-link-card" onclick="goScreen('cart')"><div class="soc-ico" style="background:rgba(16,185,129,0.15);">🛍️</div><div><div class="soc-info-name">My Cart</div><div class="soc-info-sub">View & place orders</div></div><div class="soc-arrow">›</div></div>
     <div class="social-link-card" onclick="goScreen('admin')"><div class="soc-ico" style="background:rgba(239,68,68,0.15);">🔐</div><div><div class="soc-info-name">Admin Dashboard</div><div class="soc-info-sub">Manage submissions & send notifications</div></div><div class="soc-arrow">›</div></div>
-    <div class="social-link-card" onclick="goScreen('adminstore')"><div class="soc-ico" style="background:rgba(245,166,35,0.15);">🛍️</div><div><div class="soc-info-name">Manage Store</div><div class="soc-info-sub">Add & edit products</div></div><div class="soc-arrow">›</div></div>
-    <div class="social-link-card" onclick="goScreen('setup')"><div class="soc-ico" style="background:rgba(99,102,241,0.15);">⚙️</div><div><div class="soc-info-name">Setup</div><div class="soc-info-sub">Google Sheets connection</div></div><div class="soc-arrow">›</div></div>
   </div>
 
   <div class="sec-head"><div class="sec-title">Follow Us</div></div>
@@ -1261,8 +1259,8 @@ async function fbQuery(c,f,v){if(!db)return[];try{var s=await db.collection(c).w
       <button class="admin-btn primary" onclick="exportCSV()">📥 Export</button>
     </div>
     <div class="admin-action-row" style="margin-top:6px;">
-      <button class="admin-btn primary" onclick="document.getElementById('adminAddCustSection').scrollIntoView({behavior:'smooth'})">➕ Add Customer</button>
-      <button class="admin-btn notif" onclick="document.getElementById('adminMediaSection').scrollIntoView({behavior:'smooth'})">📷 Upload Media</button>
+      <button class="admin-btn primary" onclick="scrollToSection('adminAddCustSection')">➕ Add Customer</button>
+      <button class="admin-btn notif" onclick="scrollToSection('adminMediaSection')">📷 Upload Media</button>
       <button class="admin-btn secondary" onclick="toggleAdminSetup()">⚙️ Setup</button>
       <button class="admin-btn danger" onclick="adminLogout()">🔓 Logout</button>
     </div>
@@ -1579,8 +1577,9 @@ function goScreen(id, isBack) {
   // Show/hide back button
   var backBtn = document.getElementById('backBtn');
   if(backBtn) backBtn.style.display = (screenHistory.length > 1 && id !== 'home') ? 'flex' : 'none';
-  // Admin security
+  // Admin security — block adminstore if not logged in
   if(id==='setup'){goScreen('admin',isBack);return;}
+  if(id==='adminstore' && !adminLoggedIn){goScreen('admin',isBack);return;}
   if(id==='admin' && !adminLoggedIn){
     var lb=document.getElementById('adminLoginBox'); var db=document.getElementById('adminDash');
     if(lb) lb.style.display=''; if(db) db.style.display='none';
@@ -1610,6 +1609,11 @@ function mobPage(id) { goScreen(id); }
 
 
 // ── ADMIN OVERRIDES ──────────────────────────────
+function scrollToSection(id){
+  var el=document.getElementById(id);
+  var sa=document.getElementById('screen-area');
+  if(el&&sa){var offset=el.getBoundingClientRect().top-sa.getBoundingClientRect().top+sa.scrollTop;sa.scrollTo({top:offset-10,behavior:'smooth'});}
+}
 function adminLogin(){
   var pwdInput = document.getElementById('adminPwd');
   var pwd = pwdInput.value.trim();
